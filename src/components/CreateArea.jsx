@@ -1,46 +1,67 @@
 import React, { useState } from "react";
 
+import AddIcon from "@material-ui/icons/Add";
+import Fab from "@material-ui/core/Fab";
+import Zoom from "@material-ui/core/Zoom";
+
 function CreateArea(props) {
   const [note, setNote] = useState({
     title: "",
     content: ""
   });
+  const [ifClick, setIfClick] = useState(false);
 
-  const handleNote = (event) => {
+  function handleChange(event) {
     const { name, value } = event.target;
-    setNote((prev) => {
+
+    setNote((prevNote) => {
       return {
-        ...prev,
+        ...prevNote,
         [name]: value
       };
     });
-  };
+  }
+
+  function submitNote(event) {
+    if (note.title || note.content) {
+      props.onAdd(note);
+      setNote({
+        title: "",
+        content: ""
+      });
+      setIfClick(false);
+    }
+    event.preventDefault();
+  }
+
+  function handleClick() {
+    setIfClick(true);
+  }
 
   return (
     <div>
-      <form>
-        <input
-          onChange={handleNote}
-          name="title"
-          placeholder="Title"
-          value={note.title}
-        />
+      <form className="create-note">
+        <Zoom in={ifClick}>
+          <input
+            name="title"
+            onChange={handleChange}
+            value={note.title}
+            placeholder="Title"
+          />
+        </Zoom>
         <textarea
-          onChange={handleNote}
           name="content"
-          placeholder="Take a note..."
-          rows="3"
+          onChange={handleChange}
           value={note.content}
+          placeholder="Take a note..."
+          rows={ifClick ? "3" : "1"}
+          onClick={handleClick}
         />
-        <button
-          onClick={(event) => {
-            props.addNote(note);
-            setNote({ title: "", content: "" });
-            event.preventDefault();
-          }}
-        >
-        +
-        </button>
+        <Zoom in={ifClick}>
+          <Fab onClick={submitNote}>
+            <AddIcon />
+          </Fab>
+        </Zoom>
       </form>
     </div>
   );
